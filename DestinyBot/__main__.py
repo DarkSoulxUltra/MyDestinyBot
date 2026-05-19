@@ -941,12 +941,9 @@ if __name__ == "__main__":
             pbot.start()
             LOGGER.info("Pyrogram bot client started successfully!")
             break
-        except pyrogram.errors.BadMsgNotification as e:
-            if e.error_code == 16 or "[16]" in str(e):
-                LOGGER.warning("Clock desynchronization [16] detected during startup. Pyrogram has synchronized time offset internally. Retrying in 2 seconds...")
-                time.sleep(2)
-            else:
-                raise e
+        except pyrogram.errors.BadMsgNotification:
+            LOGGER.warning("Clock desynchronization [16] detected during startup. Pyrogram has synchronized time offset internally. Retrying in 2 seconds...")
+            time.sleep(2)
         except pyrogram.errors.FloodWait as e:
             LOGGER.warning(f"Pyrogram hit FloodWait: Must wait for {e.value} seconds. Sleeping...")
             time.sleep(e.value + 2)
