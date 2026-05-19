@@ -127,7 +127,7 @@ if ENV:
     LASTFM_API_KEY = os.environ.get("LASTFM_API_KEY", None)
     CF_API_KEY = os.environ.get("CF_API_KEY", None)
     WELCOME_DELAY_KICK_SEC = os.environ.get("WELCOME_DELAY_KICL_SEC", None)
-    BOT_ID = int(os.environ.get("BOT_ID", None))
+    BOT_ID = int(os.environ.get("BOT_ID") or TOKEN.split(":")[0])
     ARQ_API_URL = "https://thearq.tech/"
     ARQ_API_KEY = os.environ.get("ARQ_API_KEY", None)
     # ARQ_API_KEY = "JSTHYI-JSMIOA-KSAEWA-GQLTYS-ARQ"
