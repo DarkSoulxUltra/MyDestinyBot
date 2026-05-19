@@ -663,7 +663,7 @@ def topairing(update: Update, context: CallbackContext):
     query = '''
     query {
       Page(page: 1, perPage: 10) {
-        media(status: AIRING, sort: POPULARITY_DESC, type: ANIME) {
+        media(status: RELEASING, sort: POPULARITY_DESC, type: ANIME) {
           title {
             romaji
             english
