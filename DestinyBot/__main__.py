@@ -921,21 +921,34 @@ if __name__ == "__main__":
     # --------------------------
 
     LOGGER.info("Successfully loaded modules: " + str(ALL_MODULES))
-    telethn.start(bot_token=TOKEN)
-    
-    # Start Pyrogram client with BadMsgNotification [16] retry wrapper
-    import pyrogram
-    for attempt in range(3):
+    # Start Telethon bot client with FloodWait retry
+    import telethon.errors
+    while True:
         try:
-            LOGGER.info(f"Starting Pyrogram bot client (attempt {attempt + 1})...")
+            LOGGER.info("Starting Telethon bot client...")
+            telethn.start(bot_token=TOKEN)
+            LOGGER.info("Telethon bot client started successfully!")
+            break
+        except telethon.errors.FloodWaitError as e:
+            LOGGER.warning(f"Telethon hit FloodWait: Must wait for {e.seconds} seconds. Sleeping...")
+            time.sleep(e.seconds + 2)
+    
+    # Start Pyrogram client with BadMsgNotification [16] and FloodWait retry wrapper
+    import pyrogram
+    while True:
+        try:
+            LOGGER.info("Starting Pyrogram bot client...")
             pbot.start()
             LOGGER.info("Pyrogram bot client started successfully!")
             break
         except pyrogram.errors.BadMsgNotification as e:
-            if attempt < 2 and (e.error_code == 16 or "[16]" in str(e)):
+            if e.error_code == 16 or "[16]" in str(e):
                 LOGGER.warning("Clock desynchronization [16] detected during startup. Pyrogram has synchronized time offset internally. Retrying in 2 seconds...")
                 time.sleep(2)
             else:
                 raise e
+        except pyrogram.errors.FloodWait as e:
+            LOGGER.warning(f"Pyrogram hit FloodWait: Must wait for {e.value} seconds. Sleeping...")
+            time.sleep(e.value + 2)
                 
     main()
