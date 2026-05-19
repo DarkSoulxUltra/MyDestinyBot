@@ -63,6 +63,7 @@ def download_youtube_audio(url: str):
             "format": "bestaudio",
             "writethumbnail": True,
             "quiet": True,
+            "extractor_args": {"youtube": {"player_client": ["ios"]}},
         }
     ) as ydl:
         info_dict = ydl.extract_info(url, download=False)
@@ -122,6 +123,7 @@ async def ytmusic(client, message: Message):
         "outtmpl": "%(id)s.mp4",
         "logtostderr": False,
         "quiet": True,
+        "extractor_args": {"youtube": {"player_client": ["ios"]}},
     }
     try:
         with YoutubeDL(opts) as ytdl:
@@ -198,6 +200,7 @@ async def ytmusic(client, message: Message):
         "outtmpl": "%(id)s.mp3",
         "quiet": True,
         "logtostderr": False,
+        "extractor_args": {"youtube": {"player_client": ["ios"]}},
     }
     try:
         with YoutubeDL(opts) as ytdl:
