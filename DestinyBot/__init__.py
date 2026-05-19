@@ -87,13 +87,13 @@ if ENV:
     except ValueError:
         raise Exception("Your tiger users list does not contain valid integers.")
 
-    INFOPIC = bool(os.environ.get("INFOPIC", True))
+    INFOPIC = str(os.environ.get("INFOPIC", "True")).strip().lower() in ("true", "1", "yes", "y", "on")
     BOT_USERNAME = os.environ.get("BOT_USERNAME", None)
     EVENT_LOGS = os.environ.get("EVENT_LOGS", None)
     REQUEST_CHAT_ID = os.environ.get("REQUEST_CHAT_ID", None)
     SUPPORT_CHAT_ID = os.environ.get("SUPPORT_CHAT_ID", None)
     ARQ_API_KEY = os.environ.get("ARQ_API_KEY", None)
-    WEBHOOK = bool(os.environ.get("WEBHOOK", False))
+    WEBHOOK = str(os.environ.get("WEBHOOK", "False")).strip().lower() in ("true", "1", "yes", "y", "on")
     URL = os.environ.get("URL", "")  # Does not contain token
     PORT = int(os.environ.get("PORT", 5000))
     CERT_PATH = os.environ.get("CERT_PATH")
