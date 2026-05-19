@@ -54,7 +54,6 @@ lyrics_extractor
 asyncio
 cloudscraper
 dateparser
-pymongo
 dnspython
 secureme
 apscheduler
@@ -76,11 +75,9 @@ better_profanity
 textblob 
 nudepy
 nekos.py
-motor
 gpytranslate
 fontTools
 opencv-python-headless
-odmantic
 tzlocal
 pendulum
 fuzzysearch

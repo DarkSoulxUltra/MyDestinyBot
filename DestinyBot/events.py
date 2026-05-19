@@ -6,14 +6,8 @@ import re
 from pathlib import Path
 from telethon import events
 
-from pymongo import MongoClient
-from DestinyBot import MONGO_DB_URI
+from DestinyBot.modules.sql.global_bans_sql import is_user_gbanned
 from DestinyBot import telethn
-
-client = MongoClient()
-client = MongoClient(MONGO_DB_URI)
-db = client["unmeirobot"]
-gbanned = db.gban
 
 def register(**args):
     """ Registers a new message. """
@@ -124,10 +118,8 @@ def bot(**args):
                   print("i don't work in small chats")
                   return
                           
-            users = gbanned.find({})
-            for c in users:
-                if check.sender_id == c["user"]:
-                    return
+            if is_user_gbanned(check.sender_id):
+                return
             try:
                 await func(check)
                 try:

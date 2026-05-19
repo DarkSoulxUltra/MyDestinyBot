@@ -33,13 +33,12 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 from pyrogram.types import Message
 
 from DestinyBot import aiohttpsession as aiosession
-from DestinyBot.ex_plugins.dbfunctions import start_restart_stage
 from DestinyBot.utils.http import get, post
 
 
 async def restart(m: Message):
     if m:
-        await start_restart_stage(m.chat.id, m.message_id)
+        pass
     execvp(executable, [executable, "-m", "DestinyBot"])
 
 
