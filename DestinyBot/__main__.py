@@ -1,40 +1,4 @@
-# --- DYNAMIC CLOCK SYNCHRONIZATION ---
-import time
-try:
-    import urllib.request
-    import email.utils
-    import logging
-    import sys
-    
-    req = urllib.request.Request('https://api.telegram.org', method='HEAD')
-    with urllib.request.urlopen(req, timeout=5) as response:
-        date_str = response.headers.get('Date')
-        if date_str:
-            date_tuple = email.utils.parsedate_tz(date_str)
-            true_time = email.utils.mktime_tz(date_tuple)
-            offset = true_time - time.time()
-            
-            # Monkeypatch time.time
-            _original_time = time.time
-            time.time = lambda: _original_time() + offset
-            
-            # Monkeypatch time.time_ns
-            if hasattr(time, 'time_ns'):
-                _original_time_ns = time.time_ns
-                time.time_ns = lambda: _original_time_ns() + int(offset * 1_000_000_000)
-                
-            # Log using stderr and logging to guarantee output visibility
-            sys.stderr.write(f"[DestinyBot] Dynamic Clock Sync: Offset of {round(offset, 2)}s applied successfully!\n")
-            sys.stderr.flush()
-            
-            logging.basicConfig(level=logging.INFO)
-            logger = logging.getLogger('[DestinyBot]')
-            logger.info(f"Dynamic Clock Sync: Offset of {round(offset, 2)}s applied. True time: {true_time}")
-except Exception as e:
-    import sys
-    sys.stderr.write(f"[DestinyBot] Dynamic Clock Sync Failed: {e}\n")
-    sys.stderr.flush()
-# -------------------------------------
+# Clock sync removed to avoid double-offset conflicts with Pyrogram's native MTProto time sync
 
 import json, os, html, time, re, sys, traceback, urllib, importlib
 import DestinyBot.modules.sql.users_sql as sql
@@ -958,5 +922,20 @@ if __name__ == "__main__":
 
     LOGGER.info("Successfully loaded modules: " + str(ALL_MODULES))
     telethn.start(bot_token=TOKEN)
-    pbot.start()
+    
+    # Start Pyrogram client with BadMsgNotification [16] retry wrapper
+    import pyrogram
+    for attempt in range(3):
+        try:
+            LOGGER.info(f"Starting Pyrogram bot client (attempt {attempt + 1})...")
+            pbot.start()
+            LOGGER.info("Pyrogram bot client started successfully!")
+            break
+        except pyrogram.errors.BadMsgNotification as e:
+            if attempt < 2 and (e.error_code == 16 or "[16]" in str(e)):
+                LOGGER.warning("Clock desynchronization [16] detected during startup. Pyrogram has synchronized time offset internally. Retrying in 2 seconds...")
+                time.sleep(2)
+            else:
+                raise e
+                
     main()
