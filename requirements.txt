@@ -88,6 +88,6 @@ hentai --only-binary all
 natsort
 html-telegraph-poster
 NHentai-API
-pyYAML>=5.1.2
+pyYAML>=6.0.3
 ShazamAPI
 yt-dlp
