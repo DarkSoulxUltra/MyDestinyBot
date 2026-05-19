@@ -659,6 +659,35 @@ def upcoming(update: Update, context: CallbackContext):
     update.effective_message.reply_text(upcoming_message)
 
 
+def topairing(update: Update, context: CallbackContext):
+    query = '''
+    query {
+      Page(page: 1, perPage: 10) {
+        media(status: AIRING, sort: POPULARITY_DESC, type: ANIME) {
+          title {
+            romaji
+            english
+          }
+          siteUrl
+          averageScore
+        }
+      }
+    }
+    '''
+    try:
+        response = requests.post(url, json={"query": query}).json()
+        media_list = response["data"]["Page"]["media"]
+        msg = "🔥 *Top Airing Anime List* 🔥\n\n"
+        for i, media in enumerate(media_list, start=1):
+            title = media["title"]["english"] or media["title"]["romaji"]
+            score = media.get("averageScore")
+            score_str = f"({score}⭐)" if score else ""
+            msg += f"{i}. [{title}]({media['siteUrl']}) {score_str}\n"
+        update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+    except Exception as e:
+        update.effective_message.reply_text(f"Error fetching top airing anime: {str(e)}")
+
+
 def button(update: Update, context: CallbackContext):
     bot = context.bot
     query = update.callback_query
@@ -857,6 +886,7 @@ Note:
 ✮ /user <user>: returns information about a MyAnimeList user.
 ✮ /upcoming: returns a list of new anime in the upcoming seasons.
 ✮ /airing <anime>: returns anime airing info.
+✮ /topairing: returns a list of currently top popular airing anime.
 ✮ /kaizoku <anime>: search an anime on animekaizoku.com
 ✮ /kayo <anime>: search an anime on animekayo.com
 
@@ -879,6 +909,7 @@ CHARACTER_HANDLER = DisableAbleCommandHandler("character", character, run_async=
 MANGA_HANDLER = DisableAbleCommandHandler("manga", manga, run_async=True)
 USER_HANDLER = DisableAbleCommandHandler("user", user, run_async=True)
 UPCOMING_HANDLER = DisableAbleCommandHandler("upcoming", upcoming, run_async=True)
+TOP_AIRING_HANDLER = DisableAbleCommandHandler("topairing", topairing, run_async=True)
 KAIZOKU_SEARCH_HANDLER = DisableAbleCommandHandler("kaizoku", kaizoku, run_async=True)
 KAYO_SEARCH_HANDLER = DisableAbleCommandHandler("kayo", kayo, run_async=True)
 BUTTON_HANDLER = CallbackQueryHandler(button, pattern='anime_.*')
@@ -896,14 +927,16 @@ dispatcher.add_handler(USER_HANDLER)
 dispatcher.add_handler(KAIZOKU_SEARCH_HANDLER)
 dispatcher.add_handler(KAYO_SEARCH_HANDLER)
 dispatcher.add_handler(UPCOMING_HANDLER)
+dispatcher.add_handler(TOP_AIRING_HANDLER)
 
 __mod_name__ = "Anime"
 __command_list__ = [
-    "anime", "manga", "character", "user", "upcoming", "kaizoku", "airing",
-    "kayo", "alive", "request", "gsearch"
+    "anime", "manga", "character", "user", "upcoming", "topairing", "kaizoku",
+    "airing", "kayo", "alive", "request", "gsearch"
 ]
 __handlers__ = [
     ANIME_HANDLER, CHARACTER_HANDLER, MANGA_HANDLER, USER_HANDLER,
-    UPCOMING_HANDLER, KAIZOKU_SEARCH_HANDLER, KAYO_SEARCH_HANDLER,
-    BUTTON_HANDLER, AIRING_HANDLER, REQUEST_HANDLER, G_HANDLER
+    UPCOMING_HANDLER, TOP_AIRING_HANDLER, KAIZOKU_SEARCH_HANDLER,
+    KAYO_SEARCH_HANDLER, BUTTON_HANDLER, AIRING_HANDLER, REQUEST_HANDLER,
+    G_HANDLER
 ]
