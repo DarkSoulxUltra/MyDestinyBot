@@ -929,6 +929,33 @@ def main():
 
 
 if __name__ == "__main__":
+    # --- RENDER PORT BYPASS ---
+    import threading
+    import http.server
+    import socketserver
+    
+    def run_port_bypass():
+        port_str = os.environ.get("PORT", "10000")
+        try:
+            port = int(port_str)
+            class HealthCheckHandler(http.server.SimpleHTTPRequestHandler):
+                def do_GET(self):
+                    self.send_response(200)
+                    self.send_header("Content-type", "text/plain")
+                    self.end_headers()
+                    self.wfile.write(b"Bot is alive!")
+                def log_message(self, format, *args):
+                    pass
+                    
+            server = socketserver.TCPServer(("0.0.0.0", port), HealthCheckHandler)
+            LOGGER.info(f"[DestinyBot] Health check server listening on port {port}")
+            server.serve_forever()
+        except Exception as e:
+            LOGGER.error(f"[DestinyBot] Failed to start health check server: {e}")
+
+    threading.Thread(target=run_port_bypass, daemon=True).start()
+    # --------------------------
+
     LOGGER.info("Successfully loaded modules: " + str(ALL_MODULES))
     telethn.start(bot_token=TOKEN)
     pbot.start()
