@@ -19,9 +19,11 @@ try:
             if abs(offset) > 1.0:
                 _original_time = time.time
                 time.time = lambda: _original_time() + offset
-                print(f"[DestinyBot] System clock drift of {round(offset, 2)}s detected. Synchronized successfully!")
+                sys.stdout.write(f"[DestinyBot] System clock drift of {round(offset, 2)}s detected. Synchronized successfully!\n")
+                sys.stdout.flush()
 except Exception as e:
-    print(f"[DestinyBot] Failed to synchronize clock: {e}")
+    sys.stdout.write(f"[DestinyBot] Failed to synchronize clock in __init__: {e}\n")
+    sys.stdout.flush()
 # -------------------------------------
 
 import spamwatch

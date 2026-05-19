@@ -1,3 +1,27 @@
+# --- DYNAMIC CLOCK SYNCHRONIZATION ---
+import time
+try:
+    import urllib.request
+    import email.utils
+    import sys
+    req = urllib.request.Request('https://www.google.com', method='HEAD')
+    with urllib.request.urlopen(req, timeout=5) as response:
+        date_str = response.headers.get('Date')
+        if date_str:
+            date_tuple = email.utils.parsedate_tz(date_str)
+            true_time = email.utils.mktime_tz(date_tuple)
+            offset = true_time - time.time()
+            if abs(offset) > 1.0:
+                _original_time = time.time
+                time.time = lambda: _original_time() + offset
+                sys.stdout.write(f"[DestinyBot] Dynamic Clock Sync: Offset of {round(offset, 2)}s corrected!\n")
+                sys.stdout.flush()
+except Exception as e:
+    import sys
+    sys.stdout.write(f"[DestinyBot] Dynamic Clock Sync Failed: {e}\n")
+    sys.stdout.flush()
+# -------------------------------------
+
 import json, os, html, time, re, sys, traceback, urllib, importlib
 import DestinyBot.modules.sql.users_sql as sql
 from DestinyBot.modules.helper_funcs.extraction import (
