@@ -17,7 +17,7 @@ MemesReddit = [
 async def meme(client, message):
     async with aiohttp.ClientSession() as destiny_session:
         async with destiny_session.get(
-            "https://meme-api.herokuapp.com/gimme/wholesomememes"
+            "https://meme-api.com/gimme/wholesomememes"
         ) as resp:
             r = await resp.json()
             await message.reply_photo(r["url"], caption=r["title"])
@@ -26,7 +26,7 @@ async def meme(client, message):
 async def cursedmemes(client, message):
     async with aiohttp.ClientSession() as destiny_session:
         async with destiny_session.get(
-            "https://meme-api.herokuapp.com/gimme/cursedcomments"
+            "https://meme-api.com/gimme/cursedcomments"
         ) as resp:
             r = await resp.json()
             await message.reply_photo(r["url"], caption=r["title"])
@@ -35,7 +35,7 @@ async def cursedmemes(client, message):
 async def shitpost(client, message):
     async with aiohttp.ClientSession() as destiny_session:
         async with destiny_session.get(
-            "https://meme-api.herokuapp.com/gimme/shitposting"
+            "https://meme-api.com/gimme/shitposting"
         ) as resp:
             r = await resp.json()
             await message.reply_photo(r["url"], caption=r["title"])
@@ -44,7 +44,7 @@ async def shitpost(client, message):
 async def fbi(client, message):
     async with aiohttp.ClientSession() as destiny_session:
         async with destiny_session.get(
-            "https://meme-api.herokuapp.com/gimme/FBI_Memes"
+            "https://meme-api.com/gimme/FBI_Memes"
         ) as resp:
             r = await resp.json()
             await message.reply_photo(r["url"], caption=r["title"])
@@ -53,7 +53,7 @@ async def fbi(client, message):
 async def teenagers(client, message):
     async with aiohttp.ClientSession() as destiny_session:
         async with destiny_session.get(
-            "https://meme-api.herokuapp.com/gimme/teenagers"
+            "https://meme-api.com/gimme/teenagers"
         ) as resp:
             r = await resp.json()
             await message.reply_photo(r["url"], caption=r["title"])
@@ -63,7 +63,7 @@ async def teenagers(client, message):
 async def hmemes(client, message):
     async with aiohttp.ClientSession() as destiny_session:
         async with destiny_session.get(
-            "https://meme-api.herokuapp.com/gimme/hornyresistance"
+            "https://meme-api.com/gimme/hornyresistance"
         ) as resp:
             r = await resp.json()
             await message.reply_photo(r["url"], caption=r["title"])
@@ -72,7 +72,7 @@ async def hmemes(client, message):
 async def pewds(client, message):
     async with aiohttp.ClientSession() as destiny_session:
         async with destiny_session.get(
-            "https://meme-api.herokuapp.com/gimme/PewdiepieSubmissions"
+            "https://meme-api.com/gimme/PewdiepieSubmissions"
         ) as resp:
             r = await resp.json()
             await message.reply_photo(r["url"], caption=r["title"])
@@ -80,7 +80,7 @@ async def pewds(client, message):
 @pbot.on_message(filters.command("memes"))
 async def memes(client, message):
     memereddit = random.choice(MemesReddit)
-    meme_link = f"https://meme-api.herokuapp.com/gimme/{memereddit}"
+    meme_link = f"https://meme-api.com/gimme/{memereddit}"
     async with aiohttp.ClientSession() as destiny_session:
         async with destiny_session.get(meme_link) as resp:
             r = await resp.json()
@@ -90,7 +90,7 @@ async def memes(client, message):
 async def hornyjail(client, message):
     async with aiohttp.ClientSession() as destiny_session:
         async with destiny_session.get(
-            "https://meme-api.herokuapp.com/gimme/Hornyjail"
+            "https://meme-api.com/gimme/Hornyjail"
         ) as resp:
             r = await resp.json()
             await message.reply_photo(r["url"], caption=r["title"])
