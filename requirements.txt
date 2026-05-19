@@ -73,7 +73,6 @@ envparse
 #profanity (Credits to Julia)
 better_profanity
 textblob 
-nudepy
 nekos.py
 gpytranslate
 fontTools
