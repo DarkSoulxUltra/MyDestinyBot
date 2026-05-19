@@ -101,7 +101,17 @@ if ENV:
     SESSION_STRING = os.environ.get("SESSION_STRING", None)
     STRING_SESSION = os.environ.get("STRING_SESSION", None)
     DB_URL = os.environ.get("DATABASE_URL")
-    DB_URL = DB_URL.replace("postgres://", "postgresql://", 1)
+    if DB_URL and "@" in DB_URL:
+        try:
+            from urllib.parse import quote_plus
+            parts = DB_URL.rsplit("@", 1)
+            scheme, user_pass = parts[0].split("://", 1)
+            user, password = user_pass.split(":", 1)
+            DB_URL = f"postgresql://{user}:{quote_plus(password)}@{parts[1]}"
+        except Exception:
+            DB_URL = DB_URL.replace("postgres://", "postgresql://", 1)
+    else:
+        DB_URL = DB_URL.replace("postgres://", "postgresql://", 1) if DB_URL else DB_URL
     REM_BG_API_KEY = os.environ.get("REM_BG_API_KEY", None)
     MONGO_DB_URI = os.environ.get("MONGO_DB_URI", None)
     ARQ_API = os.environ.get("ARQ_API", None)
