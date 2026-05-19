@@ -390,9 +390,12 @@ def kang(update, context):
 
     elif args:
         try:
+            urlemoji = msg.text.split(" ")
+            png_sticker = urlemoji[1]
+            if not (png_sticker.startswith("http://") or png_sticker.startswith("https://")):
+                msg.reply_text("Please reply to a sticker, video, gif, or image to kang it, or provide a valid image URL.")
+                return
             try:
-                urlemoji = msg.text.split(" ")
-                png_sticker = urlemoji[1]
                 sticker_emoji = urlemoji[2]
             except IndexError:
                 sticker_emoji = "🙃"
@@ -531,7 +534,7 @@ def makepack_internal(
     name = user.first_name
     name = name[:50]
     keyboard = InlineKeyboardMarkup(
-        [[InlineKeyboardButton(text="View Pack", url=f"{packname}")]]
+        [[InlineKeyboardButton(text="View Pack", url=f"t.me/addstickers/{packname}")]]
     )
     try:
         extra_version = ""
