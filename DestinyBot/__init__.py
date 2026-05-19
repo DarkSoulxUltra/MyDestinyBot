@@ -253,7 +253,10 @@ updater = tg.Updater(TOKEN, workers=WORKERS, use_context=True)
 telethn = TelegramClient(MemorySession(), API_ID, API_HASH)
 dispatcher = updater.dispatcher
 print("[INFO]: INITIALIZING AIOHTTP SESSION")
-aiohttpsession = ClientSession()
+async def make_session():
+    return ClientSession()
+loop = asyncio.get_event_loop()
+aiohttpsession = loop.run_until_complete(make_session())
 # ARQ Client
 print("[INFO]: INITIALIZING ARQ CLIENT")
 arq = ARQ(ARQ_API_URL, ARQ_API_KEY, aiohttpsession)
