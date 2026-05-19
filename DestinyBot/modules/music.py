@@ -64,6 +64,12 @@ def download_youtube_audio(url: str):
             "writethumbnail": True,
             "quiet": True,
             "extractor_args": {"youtube": {"player_client": ["ios"]}},
+            "http_headers": {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Referer": "https://www.google.com/"
+            }
         }
     ) as ydl:
         info_dict = ydl.extract_info(url, download=False)
@@ -124,6 +130,12 @@ async def ytmusic(client, message: Message):
         "logtostderr": False,
         "quiet": True,
         "extractor_args": {"youtube": {"player_client": ["ios"]}},
+        "http_headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.google.com/"
+        }
     }
     try:
         with YoutubeDL(opts) as ytdl:
@@ -201,6 +213,12 @@ async def ytmusic(client, message: Message):
         "quiet": True,
         "logtostderr": False,
         "extractor_args": {"youtube": {"player_client": ["ios"]}},
+        "http_headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.google.com/"
+        }
     }
     try:
         with YoutubeDL(opts) as ytdl:
