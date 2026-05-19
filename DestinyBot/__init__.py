@@ -258,12 +258,22 @@ aiohttpsession = ClientSession()
 print("[INFO]: INITIALIZING ARQ CLIENT")
 arq = ARQ(ARQ_API_URL, ARQ_API_KEY, aiohttpsession)
 
-ubot2 = TelegramClient(StringSession(STRING_SESSION), API_ID, API_HASH)
-try:
-    ubot2.start()
-except BaseException:
-    print("Userbot Error! Have you added a STRING_SESSION in deploying??")
-    sys.exit(1)
+if STRING_SESSION:
+    ubot2 = TelegramClient(StringSession(STRING_SESSION), API_ID, API_HASH)
+    try:
+        LOGGER.info("Connecting userbot...")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(ubot2.connect())
+        if not loop.run_until_complete(ubot2.is_user_authorized()):
+            LOGGER.error("Userbot is not authorized! Your STRING_SESSION is invalid, expired, or incorrect. The bot will exit.")
+            sys.exit(1)
+        LOGGER.info("Userbot connected successfully!")
+    except BaseException as e:
+        LOGGER.error(f"Userbot Error during connection: {e}")
+        sys.exit(1)
+else:
+    ubot2 = None
+    LOGGER.warning("STRING_SESSION is missing! Userbot features will be disabled.")
 
 pbot = Client(
     ":memory:",
