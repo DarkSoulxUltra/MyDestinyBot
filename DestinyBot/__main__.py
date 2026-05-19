@@ -897,9 +897,10 @@ def main():
         updater.start_polling(timeout=15, read_latency=4, drop_pending_updates=True)
 
     if len(argv) not in (1, 3, 4):
-        telethn.disconnect()
-    else:
-        telethn.run_until_disconnected()
+        try:
+            telethn.disconnect()
+        except:
+            pass
 
     updater.idle()
 
@@ -933,50 +934,63 @@ if __name__ == "__main__":
     # --------------------------
 
     LOGGER.info("Successfully loaded modules: " + str(ALL_MODULES))
-    # Start Telethon bot client with FloodWait retry
-    import telethon.errors
-    while True:
-        try:
-            LOGGER.info("Starting Telethon bot client...")
-            telethn.start(bot_token=TOKEN)
-            LOGGER.info("Telethon bot client started successfully!")
-            break
-        except telethon.errors.FloodWaitError as e:
-            LOGGER.warning(f"Telethon hit FloodWait: Must wait for {e.seconds} seconds. Sleeping...")
-            time.sleep(e.seconds + 2)
     
-    # Start Pyrogram client with BadMsgNotification [16] and FloodWait retry wrapper
+    # Start Telethon bot client in a background thread to prevent blocking main startup and Render deploys
+    import telethon.errors
+    def run_telethon():
+        while True:
+            try:
+                LOGGER.info("Starting Telethon bot client...")
+                telethn.start(bot_token=TOKEN)
+                LOGGER.info("Telethon bot client started successfully!")
+                break
+            except telethon.errors.FloodWaitError as e:
+                LOGGER.warning(f"Telethon hit FloodWait: Must wait for {e.seconds} seconds. Sleeping background thread...")
+                time.sleep(e.seconds + 2)
+            except Exception as ex:
+                LOGGER.error(f"Telethon encountered an error during startup: {ex}. Retrying in 10 seconds...")
+                time.sleep(10)
+
+    threading.Thread(target=run_telethon, daemon=True).start()
+    
+    # Start Pyrogram client with BadMsgNotification [16] and FloodWait retry wrapper in a background thread
     import pyrogram
-    while True:
-        try:
-            LOGGER.info("Starting Pyrogram bot client...")
-            pbot.start()
-            LOGGER.info("Pyrogram bot client started successfully!")
-            break
-        except pyrogram.errors.BadMsgNotification:
-            LOGGER.warning("Clock desynchronization [16] detected during startup. Pyrogram has synchronized time offset internally. Retrying in 2 seconds...")
-            time.sleep(2)
-        except pyrogram.errors.FloodWait as e:
-            seconds = 0
-            if hasattr(e, "value"):
-                seconds = e.value
-            elif hasattr(e, "x"):
-                seconds = e.x
-            elif hasattr(e, "seconds"):
-                seconds = e.seconds
-            
-            if not seconds or not isinstance(seconds, int):
-                try:
-                    import re
-                    match = re.search(r"(\d+)\s+seconds", str(e))
-                    if match:
-                        seconds = int(match.group(1))
-                except:
-                    pass
-            if not seconds:
-                seconds = 180
+    def run_pyrogram():
+        while True:
+            try:
+                LOGGER.info("Starting Pyrogram bot client...")
+                pbot.start()
+                LOGGER.info("Pyrogram bot client started successfully!")
+                break
+            except pyrogram.errors.BadMsgNotification:
+                LOGGER.warning("Clock desynchronization [16] detected during startup. Pyrogram has synchronized time offset internally. Retrying in 2 seconds...")
+                time.sleep(2)
+            except pyrogram.errors.FloodWait as e:
+                seconds = 0
+                if hasattr(e, "value"):
+                    seconds = e.value
+                elif hasattr(e, "x"):
+                    seconds = e.x
+                elif hasattr(e, "seconds"):
+                    seconds = e.seconds
                 
-            LOGGER.warning(f"Pyrogram hit FloodWait: Must wait for {seconds} seconds. Sleeping...")
-            time.sleep(seconds + 2)
+                if not seconds or not isinstance(seconds, int):
+                    try:
+                        import re
+                        match = re.search(r"(\d+)\s+seconds", str(e))
+                        if match:
+                            seconds = int(match.group(1))
+                    except:
+                        pass
+                if not seconds:
+                    seconds = 180
+                    
+                LOGGER.warning(f"Pyrogram hit FloodWait: Must wait for {seconds} seconds. Sleeping background thread...")
+                time.sleep(seconds + 2)
+            except Exception as ex:
+                LOGGER.error(f"Pyrogram encountered an error during startup: {ex}. Retrying in 10 seconds...")
+                time.sleep(10)
+
+    threading.Thread(target=run_pyrogram, daemon=True).start()
                 
     main()
