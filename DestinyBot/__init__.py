@@ -3,8 +3,27 @@ import logging
 import os
 import sys
 import json
-import asyncio
 import time
+
+# --- DYNAMIC CLOCK SYNCHRONIZATION ---
+try:
+    import urllib.request
+    import email.utils
+    req = urllib.request.Request('https://www.google.com', method='HEAD')
+    with urllib.request.urlopen(req, timeout=5) as response:
+        date_str = response.headers.get('Date')
+        if date_str:
+            date_tuple = email.utils.parsedate_tz(date_str)
+            true_time = email.utils.mktime_tz(date_tuple)
+            offset = true_time - time.time()
+            if abs(offset) > 1.0:
+                _original_time = time.time
+                time.time = lambda: _original_time() + offset
+                print(f"[DestinyBot] System clock drift of {round(offset, 2)}s detected. Synchronized successfully!")
+except Exception as e:
+    print(f"[DestinyBot] Failed to synchronize clock: {e}")
+# -------------------------------------
+
 import spamwatch
 import telegram.ext as tg
 
