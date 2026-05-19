@@ -12,16 +12,17 @@ from telegram import ParseMode, Update, InlineKeyboardMarkup, InlineKeyboardButt
 from telegram.error import BadRequest
 
 def anime_quote():
-    url = "https://animechan.vercel.app/api/random"
-    # since text attribute returns dictionary like string
-    response = requests.get(url)
+    url = "https://animechan.xyz/api/random"
     try:
-        dic = json.loads(response.text)
+        response = requests.get(url, timeout=5)
+        dic = response.json()
+        quote = dic["quote"]
+        character = dic["character"]
+        anime = dic["anime"]
     except Exception:
-        pass
-    quote = dic["quote"]
-    character = dic["character"]
-    anime = dic["anime"]
+        quote = "If you don't like your destiny, don't accept it. Instead, have the courage to change it the way you want it to be!"
+        character = "Naruto Uzumaki"
+        anime = "Naruto"
     return quote, character, anime
 
 def quotes(update: Update, context: CallbackContext):
