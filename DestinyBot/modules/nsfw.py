@@ -1,5 +1,18 @@
 import datetime
 import re
+import cloudscraper
+import requests
+
+scraper = cloudscraper.create_scraper()
+_original_request = requests.Session.request
+
+def patched_request(self, method, url, *args, **kwargs):
+    if isinstance(url, str) and "nhentai.net" in url:
+        return scraper.request(method, url, *args, **kwargs)
+    return _original_request(self, method, url, *args, **kwargs)
+
+requests.Session.request = patched_request
+
 from DestinyBot import telethn as tbot
 from DestinyBot.modules.helper_funcs.tools import post_to_telegraph
 from hentai import Hentai, Utils
