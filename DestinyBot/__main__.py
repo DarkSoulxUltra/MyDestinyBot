@@ -957,7 +957,26 @@ if __name__ == "__main__":
             LOGGER.warning("Clock desynchronization [16] detected during startup. Pyrogram has synchronized time offset internally. Retrying in 2 seconds...")
             time.sleep(2)
         except pyrogram.errors.FloodWait as e:
-            LOGGER.warning(f"Pyrogram hit FloodWait: Must wait for {e.value} seconds. Sleeping...")
-            time.sleep(e.value + 2)
+            seconds = 0
+            if hasattr(e, "value"):
+                seconds = e.value
+            elif hasattr(e, "x"):
+                seconds = e.x
+            elif hasattr(e, "seconds"):
+                seconds = e.seconds
+            
+            if not seconds or not isinstance(seconds, int):
+                try:
+                    import re
+                    match = re.search(r"(\d+)\s+seconds", str(e))
+                    if match:
+                        seconds = int(match.group(1))
+                except:
+                    pass
+            if not seconds:
+                seconds = 180
+                
+            LOGGER.warning(f"Pyrogram hit FloodWait: Must wait for {seconds} seconds. Sleeping...")
+            time.sleep(seconds + 2)
                 
     main()
