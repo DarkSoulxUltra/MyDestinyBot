@@ -9,18 +9,32 @@ import time
 try:
     import urllib.request
     import email.utils
-    req = urllib.request.Request('https://www.google.com', method='HEAD')
+    import logging
+    
+    req = urllib.request.Request('https://api.telegram.org', method='HEAD')
     with urllib.request.urlopen(req, timeout=5) as response:
         date_str = response.headers.get('Date')
         if date_str:
             date_tuple = email.utils.parsedate_tz(date_str)
             true_time = email.utils.mktime_tz(date_tuple)
             offset = true_time - time.time()
-            if abs(offset) > 1.0:
-                _original_time = time.time
-                time.time = lambda: _original_time() + offset
-                sys.stdout.write(f"[DestinyBot] System clock drift of {round(offset, 2)}s detected. Synchronized successfully!\n")
-                sys.stdout.flush()
+            
+            # Monkeypatch time.time
+            _original_time = time.time
+            time.time = lambda: _original_time() + offset
+            
+            # Monkeypatch time.time_ns
+            if hasattr(time, 'time_ns'):
+                _original_time_ns = time.time_ns
+                time.time_ns = lambda: _original_time_ns() + int(offset * 1_000_000_000)
+                
+            # Log using stderr and logging to guarantee output visibility
+            sys.stderr.write(f"[DestinyBot] System clock drift of {round(offset, 2)}s detected in __init__. Synchronized successfully!\n")
+            sys.stderr.flush()
+            
+            logging.basicConfig(level=logging.INFO)
+            logger = logging.getLogger('[DestinyBot]')
+            logger.info(f"System clock drift of {round(offset, 2)}s detected in __init__. Synchronized successfully!")
 except Exception as e:
     sys.stdout.write(f"[DestinyBot] Failed to synchronize clock in __init__: {e}\n")
     sys.stdout.flush()
