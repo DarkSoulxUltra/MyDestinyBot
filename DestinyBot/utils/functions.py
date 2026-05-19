@@ -110,8 +110,21 @@ async def get_http_status_code(url: str) -> int:
 
 
 async def make_carbon(code):
-    url = "https://carbonara.vercel.app/api/cook"
-    async with aiosession.post(url, json={"code": code}) as resp:
+    url = "https://carbonara.solopov.dev/api/cook"
+    try:
+        async with aiosession.post(url, json={"code": code}, timeout=10) as resp:
+            if resp.status == 200 and "image" in resp.headers.get("Content-Type", ""):
+                image = BytesIO(await resp.read())
+                image.name = "carbon.png"
+                return image
+    except Exception:
+        pass
+
+    # Fallback to alternative vercel carbonara API
+    fallback_url = "https://carbonara.vercel.app/api/cook"
+    async with aiosession.post(fallback_url, json={"code": code}, timeout=10) as resp:
+        if resp.status != 200 or "image" not in resp.headers.get("Content-Type", ""):
+            raise Exception("Both Carbonara rendering API services are currently offline.")
         image = BytesIO(await resp.read())
     image.name = "carbon.png"
     return image

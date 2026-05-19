@@ -122,10 +122,10 @@ async def nhentai(event):
     try:
         doujin = Hentai(code)
     except BaseException as n_e:
-        if "404" in str(n_e):
-            return await event.edit(
-                f"No doujin found for `{code}`. You shouldn't use nhentai:-("
-            )
+        err_msg = f"No doujin found for `{code}`. You shouldn't use nhentai:-("
+        if "404" not in str(n_e):
+            err_msg = f"Error connecting to nhentai: `{str(n_e)}`"
+        return await event.reply(err_msg)
 
     msg = ""
     imgs = "".join(f"<img src='{url}'/>" for url in doujin.image_urls)
