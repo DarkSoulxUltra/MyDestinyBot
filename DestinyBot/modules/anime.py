@@ -676,13 +676,24 @@ def topairing(update: Update, context: CallbackContext):
     '''
     try:
         response = requests.post(url, json={"query": query}).json()
-        media_list = response["data"]["Page"]["media"]
+        if "errors" in response:
+            error_msg = response["errors"][0]["message"]
+            update.effective_message.reply_text(f"Anilist API error: {error_msg}")
+            return
+
+        data = response.get("data")
+        if not data or not data.get("Page") or not data["Page"].get("media"):
+            update.effective_message.reply_text("No airing anime found.")
+            return
+
+        media_list = data["Page"]["media"]
         msg = "🔥 *Top Airing Anime List* 🔥\n\n"
         for i, media in enumerate(media_list, start=1):
-            title = media["title"]["english"] or media["title"]["romaji"]
+            title_dict = media.get("title") or {}
+            title = title_dict.get("english") or title_dict.get("romaji") or "Unknown Title"
             score = media.get("averageScore")
             score_str = f"({score}⭐)" if score else ""
-            msg += f"{i}. [{title}]({media['siteUrl']}) {score_str}\n"
+            msg += f"{i}. [{title}]({media.get('siteUrl', 'https://anilist.co')}) {score_str}\n"
         update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
     except Exception as e:
         update.effective_message.reply_text(f"Error fetching top airing anime: {str(e)}")
