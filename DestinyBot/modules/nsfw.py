@@ -3,14 +3,28 @@ import re
 import cloudscraper
 import requests
 
-scraper = cloudscraper.create_scraper()
+scraper = cloudscraper.create_scraper(
+    browser={
+        'browser': 'chrome',
+        'platform': 'windows',
+        'desktop': True
+    }
+)
 _original_request = requests.Session.request
 
 def patched_request(self, method, url, *args, **kwargs):
     if self is scraper:
         return _original_request(self, method, url, *args, **kwargs)
     if isinstance(url, str) and "nhentai.net" in url:
-        return scraper.request(method, url, *args, **kwargs)
+        try:
+            response = scraper.request(method, url, *args, **kwargs)
+            if response.status_code == 403 or (response.text and "Attention Required! | Cloudflare" in response.text):
+                mirror_url = url.replace("nhentai.net", "nhentai.xxx")
+                return scraper.request(method, mirror_url, *args, **kwargs)
+            return response
+        except Exception:
+            mirror_url = url.replace("nhentai.net", "nhentai.xxx")
+            return scraper.request(method, mirror_url, *args, **kwargs)
     return _original_request(self, method, url, *args, **kwargs)
 
 requests.Session.request = patched_request

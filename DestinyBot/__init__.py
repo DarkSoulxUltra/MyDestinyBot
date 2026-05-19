@@ -9,6 +9,21 @@ import time
 
 import spamwatch
 import telegram.ext as tg
+from telegram import StickerSet
+
+_orig_de_json = StickerSet.de_json
+
+@classmethod
+def patched_de_json(cls, data, bot):
+    if data:
+        data = data.copy()
+        if "is_animated" not in data:
+            data["is_animated"] = False
+        if "is_video" not in data:
+            data["is_video"] = False
+    return _orig_de_json(data, bot)
+
+StickerSet.de_json = classmethod(patched_de_json)
 
 from inspect import getfullargspec
 from aiohttp import ClientSession
