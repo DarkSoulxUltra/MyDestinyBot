@@ -61,23 +61,37 @@ async def logo_gen(event):
             elif "pic" in mediainfo(temp.media):
                 bg_ = await temp.download_media()
     else:
-        pics = []
-        async for i in ubot2.iter_messages(
-            "@KenLogopack", filter=InputMessagesFilterPhotos
-        ):
-            pics.append(i)
-        id_ = random.choice(pics)
-        bg_ = await id_.download_media()
+        try:
+            pics = []
+            async for i in ubot2.iter_messages(
+                "@KenLogopack", filter=InputMessagesFilterPhotos
+            ):
+                pics.append(i)
+            id_ = random.choice(pics)
+            bg_ = await id_.download_media()
+        except Exception as e:
+            bg_candidates = [
+                "./DestinyBot/resources/cosette.destiny-20220205-0024.jpg",
+                "./DestinyBot/resources/template.jpg"
+            ]
+            bg_ = random.choice([x for x in bg_candidates if os.path.exists(x)])
         fpath_ = glob.glob("./DestinyBot/resources/fonts/*")
         font_ = random.choice(fpath_)
     if not bg_:
-        pics = []
-        async for i in ubot2.iter_messages(
-            "@KenLogopack", filter=InputMessagesFilterPhotos
-        ):
-            pics.append(i)
-        id_ = random.choice(pics)
-        bg_ = await id_.download_media()
+        try:
+            pics = []
+            async for i in ubot2.iter_messages(
+                "@KenLogopack", filter=InputMessagesFilterPhotos
+            ):
+                pics.append(i)
+            id_ = random.choice(pics)
+            bg_ = await id_.download_media()
+        except Exception as e:
+            bg_candidates = [
+                "./DestinyBot/resources/cosette.destiny-20220205-0024.jpg",
+                "./DestinyBot/resources/template.jpg"
+            ]
+            bg_ = random.choice([x for x in bg_candidates if os.path.exists(x)])
     if not font_:
         fpath_ = glob.glob("./DestinyBot/resources/fonts/*")
         font_ = random.choice(fpath_)
@@ -93,7 +107,12 @@ async def logo_gen(event):
     img = Image.open(bg_)
     draw = ImageDraw.Draw(img)
     font = ImageFont.truetype(font_, fnt_size)
-    w, h = draw.textsize(name, font=font)
+    try:
+        w, h = draw.textsize(name, font=font)
+    except AttributeError:
+        bbox = draw.textbbox((0, 0), name, font=font)
+        w = bbox[2] - bbox[0]
+        h = bbox[3] - bbox[1]
     h += int(h * 0.21)
     image_width, image_height = img.size
     draw.text(
@@ -144,23 +163,37 @@ async def logo_(event):
             elif "pic" in mediainfo(temp.media):
                 bg_ = await temp.download_media()
     else:
-        pics = []
-        async for i in ubot2.iter_messages(
-            "@kenlogopack", filter=InputMessagesFilterPhotos
-        ):
-            pics.append(i)
-        id_ = random.choice(pics)
-        bg_ = await id_.download_media()
+        try:
+            pics = []
+            async for i in ubot2.iter_messages(
+                "@kenlogopack", filter=InputMessagesFilterPhotos
+            ):
+                pics.append(i)
+            id_ = random.choice(pics)
+            bg_ = await id_.download_media()
+        except Exception as e:
+            bg_candidates = [
+                "./DestinyBot/resources/cosette.destiny-20220205-0024.jpg",
+                "./DestinyBot/resources/template.jpg"
+            ]
+            bg_ = random.choice([x for x in bg_candidates if os.path.exists(x)])
         fpath_ = glob.glob("./DestinyBot/resources/fonts/*")
         font_ = random.choice(fpath_)
     if not bg_:
-        pics = []
-        async for i in ubot2.iter_messages(
-            "@kenlogopack", filter=InputMessagesFilterPhotos
-        ):
-            pics.append(i)
-        id_ = random.choice(pics)
-        bg_ = await id_.download_media()
+        try:
+            pics = []
+            async for i in ubot2.iter_messages(
+                "@kenlogopack", filter=InputMessagesFilterPhotos
+            ):
+                pics.append(i)
+            id_ = random.choice(pics)
+            bg_ = await id_.download_media()
+        except Exception as e:
+            bg_candidates = [
+                "./DestinyBot/resources/cosette.destiny-20220205-0024.jpg",
+                "./DestinyBot/resources/template.jpg"
+            ]
+            bg_ = random.choice([x for x in bg_candidates if os.path.exists(x)])
     if not font_:
         fpath_ = glob.glob("./DestinyBot/resources/fonts/*")
         font_ = random.choice(fpath_)
@@ -176,7 +209,12 @@ async def logo_(event):
     img = Image.open(bg_)
     draw = ImageDraw.Draw(img)
     font = ImageFont.truetype(font_, fnt_size)
-    w, h = draw.textsize(name, font=font)
+    try:
+        w, h = draw.textsize(name, font=font)
+    except AttributeError:
+        bbox = draw.textbbox((0, 0), name, font=font)
+        w = bbox[2] - bbox[0]
+        h = bbox[3] - bbox[1]
     h += int(h * 0.21)
     image_width, image_height = img.size
     draw.text(
