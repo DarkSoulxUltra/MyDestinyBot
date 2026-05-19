@@ -129,6 +129,64 @@ def kang(update, context):
             sticker_emoji = "🙂"
 
         if not is_animated:
+            if msg.reply_to_message and msg.reply_to_message.sticker:
+                try:
+                    context.bot.add_sticker_to_set(
+                        user_id=user.id,
+                        name=packname,
+                        png_sticker=open("kangsticker.png", "rb"),
+                        emojis=sticker_emoji,
+                    )
+                    edited_keyboard = InlineKeyboardMarkup(
+                        [
+                            [
+                                InlineKeyboardButton(
+                                    text="View Pack", url=f"t.me/addstickers/{packname}"
+                                )
+                            ]
+                        ]
+                    )
+                    msg.reply_text(
+                        f"<b>Your sticker has been added!</b>"
+                        f"\nEmoji Is : {sticker_emoji}",
+                        reply_markup=edited_keyboard,
+                        parse_mode=ParseMode.HTML,
+                    )
+                except TelegramError as e:
+                    if e.message == "Stickerset_invalid":
+                        makepack_internal(
+                            update,
+                            context,
+                            msg,
+                            user,
+                            sticker_emoji,
+                            packname,
+                            packnum,
+                            png_sticker=open("kangsticker.png", "rb"),
+                        )
+                    elif e.message == "Invalid sticker emojis":
+                        msg.reply_text("Invalid emoji(s).")
+                    elif e.message == "Stickers_too_much":
+                        msg.reply_text("Max packsize reached. Press F to pay respecc.")
+                    elif e.message == "Internal Server Error: sticker set not found (500)":
+                        edited_keyboard = InlineKeyboardMarkup(
+                            [
+                                [
+                                    InlineKeyboardButton(
+                                        text="View Pack", url=f"t.me/addstickers/{packname}"
+                                    )
+                                ]
+                            ]
+                        )
+                        msg.reply_text(
+                            f"<b>Your sticker has been added!</b>"
+                            f"\nEmoji Is : {sticker_emoji}",
+                            reply_markup=edited_keyboard,
+                            parse_mode=ParseMode.HTML,
+                        )
+                    print(e)
+                return
+
             try:
                 im = Image.open(kangsticker)
                 maxsize = (512, 512)
@@ -149,8 +207,7 @@ def kang(update, context):
                     im = im.resize(sizenew)
                 else:
                     im.thumbnail(maxsize)
-                if not msg.reply_to_message.sticker:
-                    im.save(kangsticker, "PNG")
+                im.save(kangsticker, "PNG")
                 context.bot.add_sticker_to_set(
                     user_id=user.id,
                     name=packname,
