@@ -871,6 +871,14 @@ def main():
     dispatcher.add_handler(donate_handler)
     dispatcher.add_error_handler(error_callback)
 
+    # Debug message logging handler
+    def debug_incoming_messages(update: Update, context: CallbackContext):
+        msg = update.effective_message
+        if msg:
+            LOGGER.info(f"[DestinyBot Debug] Received message: '{msg.text}' from user {msg.from_user.id} ({msg.from_user.username}) in chat {update.effective_chat.id}")
+            
+    dispatcher.add_handler(MessageHandler(Filters.all, debug_incoming_messages), group=-1)
+
     if WEBHOOK:
         LOGGER.info("Using webhooks.")
         updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
